@@ -1,0 +1,26 @@
+on:
+  push:
+    branches: [ nix ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - run: nix build --print-build-logs
+      - id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+      - run: cp result/main.pdf ${{ steps.date.outputs.date }}_teoria-delle-categorie.pdf
+      - uses: docker://antonyurchenko/git-release:v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_NAME: "${{ steps.date.outputs.date }}"
+          UNRELEASED: "update"
+          UNRELEASED_TAG: unreleased
+          PRE_RELEASE: "true"
+          DRAFT_RELEASE: "false"
+          ALLOW_EMPTY_CHANGELOG: "true"
+        with:
+          args: ${{ steps.date.outputs.date }}_teoria-delle-categorie.pdf
+
