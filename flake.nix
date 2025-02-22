@@ -69,6 +69,7 @@
         devShells.default = pkgs.mkShell {
           buildInputs = [
             tex
+            (pkgs.python3.withPackages (ps: with ps; [openai tiktoken]))
           ];
         };
         packages = {
